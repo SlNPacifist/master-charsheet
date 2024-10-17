@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чарник</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Roboto:wght@400&display=swap');
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        @media print {
+            @page {
+                size: landscape
+            }
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        .container {
+            width: 297mm;
+            height: 210mm;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .input {
+            position: absolute;
+            min-width: 1mm;
+            min-height: 1mm;
+            font-family: 'Roboto', sans-serif; /* Main font for readability */
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .round {
+            border-radius: 50%;
+        }
+
+        #name {
+            left: 15mm;
+            top: 12mm;
+            width: 60mm;
+            height: 10mm;
+            line-height: 10mm;
+            font-size: 8mm;
+        }
+
+        #masterstvo {
+            left: 8.7mm;
+            top: 35.1mm;
+            width: 10mm;
+            height: 10mm;
+            line-height: 10mm;
+        }
+
+        .stat {
+            width: 11mm;
+            height: 7.5mm;
+            line-height: 7.5mm;
+        }
+
+        .stat-mod {
+            width: 9mm;
+            height: 9mm;
+            line-height: 9mm;
+        }
+
+        #strength {
+            left: 17mm;
+            top: 67mm;
+        }
+
+        #strength-mod {
+            left: 18mm;
+            top: 75mm;
+        }
+
+        #dexterity {
+            left: 17mm;
+            top: 91mm;
+        }
+
+        #dexterity-mod {
+            left: 18mm;
+            top: 99mm;
+        }
+
+        #constitution {
+            left: 17mm;
+            top: 114.5mm;
+        }
+
+        #constitution-mod {
+            left: 18mm;
+            top: 122mm;
+        }
+
+        #intelligence {
+            left: 17mm;
+            top: 138mm;
+        }
+
+        #intelligence-mod {
+            left: 18mm;
+            top: 145.5mm;
+        }
+
+        #wisdom {
+            left: 17mm;
+            top: 161mm;
+        }
+
+        #wisdom-mod {
+            left: 18mm;
+            top: 169mm;
+        }
+
+        #charisma {
+            left: 17mm;
+            top: 185mm;
+        }
+
+        #charisma-mod {
+            left: 18mm;
+            top: 193mm;
+        }
+
+        #hit-dice {
+            left: 60mm;
+            top: 48mm;
+            width: 17mm;
+            height: 10mm;
+            line-height: 10mm;
+        }
+
+        .checkbox {
+            position: absolute;
+            z-index: -1;
+            opacity: 0;
+        }
+
+        .checkbox+label {
+            display: inline-flex;
+            align-items: center;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        .checkbox+label::before {
+            content: '';
+            display: inline-block;
+        }
+
+        .save-roll.checkbox+label::before {
+            width: 1.5mm;
+            height: 1.5mm;
+            line-height: 1.5mm;
+            transform: rotate(45deg);
+        }
+
+        .ability.checkbox+label::before {
+            width: 1.5mm;
+            height: 1.5mm;
+            line-height: 1.5mm;
+            border-radius: 50%;
+        }
+
+        .checkbox:checked+label::before {
+            background-color: #c95908;
+        }
+
+        label {
+            position: absolute;
+        }
+
+        #strength-save-roll, #strength-save-roll+label {
+            left: 47.35mm;
+            top: 64.70mm;
+        }
+
+        #athletics, #athletics+label {
+            left: 47.35mm;
+            top: 69mm;
+        }
+
+        #dexterity-save-roll, #dexterity-save-roll+label {
+            left: 47.15mm;
+            top: 87.8mm;
+        }
+
+        #acrobatics, #acrobatics+label {
+            left: 47.15mm;
+            top: 91.6mm;
+        }
+
+        #sleight-of-hand, #sleight-of-hand+label {
+            left: 47.15mm;
+            top: 96mm;
+        }
+
+        #stealth, #stealth+label {
+            left: 47.15mm;
+            top: 99.86mm;
+        }
+
+        #constitution-save-roll, #constitution-save-roll+label {
+            left: 47.15mm;
+            top: 110.5mm;
+        }
+
+        #intelligence-save-roll, #intelligence-save-roll+label {
+            left: 47.15mm;
+            top: 133.4mm;
+        }
+
+        #analysis, #analysis+label {
+            left: 47.15mm;
+            top: 137mm;
+        }
+
+        #history, #history+label {
+            left: 47.15mm;
+            top: 141mm;
+        }
+
+        #arcana, #arcana+label {
+            left: 47.15mm;
+            top: 145mm;
+        }
+
+        #nature, #nature+label {
+            left: 47.15mm;
+            top: 149mm;
+        }
+
+        #religion, #religion+label {
+            left: 47.15mm;
+            top: 153mm;
+        }
+
+        #wisdom-save-roll, #wisdom-save-roll+label {
+            left: 47.20mm;
+            top: 157.9mm;
+        }
+
+        #perception, #perception+label {
+            left: 47.20mm;
+            top: 162mm;
+        }
+
+        #survival, #survival+label {
+            left: 47.20mm;
+            top: 166mm;
+        }
+
+        #medicine, #medicine+label {
+            left: 47.20mm;
+            top: 170mm;
+        }
+
+        #insight, #insight+label {
+            left: 47.20mm;
+            top: 173.5mm;
+        }
+
+        #animal-handling, #animal-handling+label {
+            left: 47.20mm;
+            top: 177.5mm;
+        }
+
+        #charisma-save-roll, #charisma-save-roll+label {
+            left: 47.15mm;
+            top: 183.65mm;
+        }
+
+        #performance, #performance+label {
+            left: 47.15mm;
+            top: 187.5mm;
+        }
+
+        #intimidation, #intimidation+label {
+            left: 47.15mm;
+            top: 191.5mm;
+        }
+
+        #deception, #deception+label {
+            left: 47.15mm;
+            top: 195.5mm;
+        }
+
+        #persuasion, #persuasion+label {
+            left: 47.15mm;
+            top: 199.5mm;
+        }
+
+        #class {
+            left: 82mm;
+            top: 8mm;
+            width: 32mm;
+            height: 7mm;
+            line-height: 7mm;
+        }
+
+        #race {
+            left: 82mm;
+            top: 20mm;
+            width: 32mm;
+            height: 7mm;
+            line-height: 7mm;
+        }
+
+        #level {
+            left: 127mm;
+            top: 8mm;
+            width: 14mm;
+            height: 7mm;
+            line-height: 7mm;
+        }
+
+        #background {
+            left: 115mm;
+            top: 20mm;
+            width: 27mm;
+            height: 7mm;
+            line-height: 7mm;
+        }
+
+        #initiative {
+            left: 85mm;
+            top: 35mm;
+            width: 15mm;
+            height: 13mm;
+            line-height: 13mm;
+        }
+
+        #speed {
+            left: 109mm;
+            top: 35mm;
+            width: 15mm;
+            height: 13mm;
+            line-height: 13mm;
+        }
+
+        #ac {
+            left: 84mm;
+            top: 60mm;
+            width: 13mm;
+            height: 10mm;
+            line-height: 10mm;
+        }
+
+        #hp {
+            left: 105mm;
+            top: 60mm;
+            width: 13mm;
+            height: 10mm;
+            line-height: 10mm;
+        }
+
+        #passive-perception {
+            left: 124mm;
+            top: 61mm;
+            width: 17mm;
+            height: 7mm;
+            line-height: 7mm;
+        }
+
+        #weapon-1-name, #weapon-1-attack-bonus, #weapon-1-damage, #weapon-1-damage-type, #weapon-2-name, #weapon-2-attack-bonus, #weapon-2-damage, #weapon-2-damage-type, #weapon-3-name, #weapon-3-attack-bonus, #weapon-3-damage, #weapon-3-damage-type {
+            height: 5mm;
+            line-height: 5mm;
+        }
+
+        #weapon-1-name, #weapon-2-name, #weapon-3-name {
+            left: 82mm;
+            width: 60mm;
+        }
+
+        #weapon-1-attack-bonus, #weapon-2-attack-bonus, #weapon-3-attack-bonus {
+            left: 83mm;
+            width: 10mm;
+        }
+
+        #weapon-1-damage, #weapon-2-damage, #weapon-3-damage {
+            left: 95mm;
+            width: 22mm;
+        }
+
+        #weapon-1-damage-type, #weapon-2-damage-type, #weapon-3-damage-type {
+            left: 119mm;
+            width: 22mm;
+        }
+
+        #weapon-1-name {
+            top: 90mm;
+        }
+
+        #weapon-1-attack-bonus, #weapon-1-damage, #weapon-1-damage-type {
+            top: 96mm;
+        }
+
+        #weapon-2-name {
+            top: 104mm;
+        }
+
+        #weapon-2-attack-bonus, #weapon-2-damage, #weapon-2-damage-type {
+            top: 110mm;
+        }
+
+        #weapon-3-name {
+            top: 117mm;
+        }
+
+        #weapon-3-attack-bonus, #weapon-3-damage, #weapon-3-damage-type {
+            top: 124mm;
+        }
+
+        #spellcasting-ability {
+            left: 83mm;
+            top: 133mm;
+            width: 17mm;
+            height: 6mm;
+            line-height: 6mm;
+        }
+
+        #spell-attack-bonus {
+            left: 103mm;
+            top: 133mm;
+            width: 17mm;
+            height: 6mm;
+            line-height: 6mm;
+        }
+
+        #spell-save-dc {
+            left: 123mm;
+            top: 133mm;
+            width: 17mm;
+            height: 6mm;
+            line-height: 6mm;
+        }
+
+        #languages {
+            left: 85mm;
+            top: 157mm;
+            width: 54mm;
+            height: 39mm;
+            line-height: 4.83mm;
+        }
+
+        #empty {
+            left: 146.5mm;
+            top: 7mm;
+            width: 69mm;
+            height: 103mm;
+        }
+
+        #abilities-1 {
+            left: 153mm;
+            top: 118mm;
+            width: 60mm;
+            height: 78mm;
+            line-height: 4.85mm;
+        }
+
+        #abilities-2 {
+            left: 219mm;
+            top: 19mm;
+            width: 67mm;
+            height: 177mm;
+            line-height: 5.1mm;
+        }
+
+        #languages, #empty, #abilities-1, #abilities-2 {
+            text-align: left;
+            vertical-align: top;
+            font-size: 3mm;
+        }
+
+        .roll-bonus {
+            width: 3mm;
+            height: 3mm;
+            line-height: 3mm;
+            left: 49mm;
+            font-size: 2mm;
+        }
+
+        #strength-save-roll-bonus {
+            top: 64mm;
+        }
+
+        #athletics-roll-bonus {
+            top: 69mm;
+        }
+
+        #dexterity-save-roll-bonus {
+            top: 87mm;
+        }
+
+        #acrobatics-roll-bonus {
+            top: 91mm;
+        }
+
+        #sleight-of-hand-roll-bonus {
+            top: 96mm;
+        }
+
+        #stealth-roll-bonus {
+            top: 99mm;
+        }
+
+        #constitution-save-roll-bonus {
+            top: 110mm;
+        }
+
+        #intelligence-save-roll-bonus {
+            top: 133mm;
+        }
+
+        #analysis-roll-bonus {
+            top: 137mm;
+        }
+
+        #history-roll-bonus {
+            top: 141mm;
+        }
+
+        #arcana-roll-bonus {
+            top: 145mm;
+        }
+
+        #nature-roll-bonus {
+            top: 149mm;
+        }
+
+        #religion-roll-bonus {
+            top: 153mm;
+        }
+
+        #wisdom-save-roll-bonus {
+            top: 157mm;
+        }
+
+        #perception-roll-bonus {
+            top: 162mm;
+        }
+
+        #survival-roll-bonus {
+            top: 166mm;
+        }
+
+        #medicine-roll-bonus {
+            top: 170mm;
+        }
+
+        #insight-roll-bonus {
+            top: 173mm;
+        }
+
+        #animal-handling-roll-bonus {
+            top: 177mm;
+        }
+
+        #charisma-save-roll-bonus {
+            top: 183mm;
+        }
+
+        #performance-roll-bonus {
+            top: 187mm;
+        }
+
+        #intimidation-roll-bonus {
+            top: 191mm;
+        }
+
+        #deception-roll-bonus {
+            top: 195mm;
+        }
+
+        #persuasion-roll-bonus {
+            top: 199mm;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <img src="./background.jpeg" alt="Image" class="image">
+        <span id="name" class="input" contenteditable="true"></span>
+        <span id="masterstvo" class="input round" contenteditable="true"></span>
+        <span id="strength" class="input stat" contenteditable="true"></span>
+        <span id="strength-mod" class="input round stat-mod" contenteditable="true"></span>
+        <span id="dexterity" class="input stat" contenteditable="true"></span>
+        <span id="dexterity-mod" class="input round stat-mod" contenteditable="true"></span>
+        <span id="constitution" class="input stat" contenteditable="true"></span>
+        <span id="constitution-mod" class="input round stat-mod" contenteditable="true"></span>
+        <span id="intelligence" class="input stat" contenteditable="true"></span>
+        <span id="intelligence-mod" class="input round stat-mod" contenteditable="true"></span>
+        <span id="wisdom" class="input stat" contenteditable="true"></span>
+        <span id="wisdom-mod" class="input round stat-mod" contenteditable="true"></span>
+        <span id="charisma" class="input stat" contenteditable="true"></span>
+        <span id="charisma-mod" class="input round stat-mod" contenteditable="true"></span>
+        <span id="hit-dice" class="input" contenteditable="true"></span>
+        <input id="strength-save-roll" class="input checkbox save-roll" type="checkbox"></input>
+        <label for="strength-save-roll"></label>
+        <span id="strength-save-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="athletics" class="input checkbox ability" type="checkbox"></input>
+        <label for="athletics"></label>
+        <span id="athletics-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="dexterity-save-roll" class="input checkbox save-roll" type="checkbox"></input>
+        <label for="dexterity-save-roll"></label>
+        <span id="dexterity-save-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="acrobatics" class="input checkbox ability" type="checkbox"></input>
+        <label for="acrobatics"></label>
+        <span id="acrobatics-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="sleight-of-hand" class="input checkbox ability" type="checkbox"></input>
+        <label for="sleight-of-hand"></label>
+        <span id="sleight-of-hand-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="stealth" class="input checkbox ability" type="checkbox"></input>
+        <label for="stealth"></label>
+        <span id="stealth-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="constitution-save-roll" class="input checkbox save-roll" type="checkbox"></input>
+        <label for="constitution-save-roll"></label>
+        <span id="constitution-save-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="intelligence-save-roll" class="input checkbox save-roll" type="checkbox"></input>
+        <label for="intelligence-save-roll"></label>
+        <span id="intelligence-save-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="analysis" class="input checkbox ability" type="checkbox"></input>
+        <label for="analysis"></label>
+        <span id="analysis-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="history" class="input checkbox ability" type="checkbox"></input>
+        <label for="history"></label>
+        <span id="history-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="arcana" class="input checkbox ability" type="checkbox"></input>
+        <label for="arcana"></label>
+        <span id="arcana-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="nature" class="input checkbox ability" type="checkbox"></input>
+        <label for="nature"></label>
+        <span id="nature-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="religion" class="input checkbox ability" type="checkbox"></input>
+        <label for="religion"></label>
+        <span id="religion-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="wisdom-save-roll" class="input checkbox save-roll" type="checkbox"></input>
+        <label for="wisdom-save-roll"></label>
+        <span id="wisdom-save-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="perception" class="input checkbox ability" type="checkbox"></input>
+        <label for="perception"></label>
+        <span id="perception-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="survival" class="input checkbox ability" type="checkbox"></input>
+        <label for="survival"></label>
+        <span id="survival-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="medicine" class="input checkbox ability" type="checkbox"></input>
+        <label for="medicine"></label>
+        <span id="medicine-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="insight" class="input checkbox ability" type="checkbox"></input>
+        <label for="insight"></label>
+        <span id="insight-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="animal-handling" class="input checkbox ability" type="checkbox"></input>
+        <label for="animal-handling"></label>
+        <span id="animal-handling-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="charisma-save-roll" class="input checkbox save-roll" type="checkbox"></input>
+        <label for="charisma-save-roll"></label>
+        <span id="charisma-save-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="performance" class="input checkbox ability" type="checkbox"></input>
+        <label for="performance"></label>
+        <span id="performance-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="intimidation" class="input checkbox ability" type="checkbox"></input>
+        <label for="intimidation"></label>
+        <span id="intimidation-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="deception" class="input checkbox ability" type="checkbox"></input>
+        <label for="deception"></label>
+        <span id="deception-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <input id="persuasion" class="input checkbox ability" type="checkbox"></input>
+        <label for="persuasion"></label>
+        <span id="persuasion-roll-bonus" class="input roll-bonus" contenteditable="true"></span>
+        <span id="class" class="input" contenteditable="true"></span>
+        <span id="race" class="input" contenteditable="true"></span>
+        <span id="level" class="input" contenteditable="true"></span>
+        <span id="background" class="input" contenteditable="true"></span>
+        <span id="initiative" class="input" contenteditable="true"></span>
+        <span id="speed" class="input" contenteditable="true"></span>
+        <span id="ac" class="input" contenteditable="true"></span>
+        <span id="hp" class="input" contenteditable="true"></span>
+        <span id="passive-perception" class="input" contenteditable="true"></span>
+        <span id="weapon-1-name" class="input" contenteditable="true"></span>
+        <span id="weapon-1-attack-bonus" class="input" contenteditable="true"></span>
+        <span id="weapon-1-damage" class="input" contenteditable="true"></span>
+        <span id="weapon-1-damage-type" class="input" contenteditable="true"></span>
+        <span id="weapon-2-name" class="input" contenteditable="true"></span>
+        <span id="weapon-2-attack-bonus" class="input" contenteditable="true"></span>
+        <span id="weapon-2-damage" class="input" contenteditable="true"></span>
+        <span id="weapon-2-damage-type" class="input" contenteditable="true"></span>
+        <span id="weapon-3-name" class="input" contenteditable="true"></span>
+        <span id="weapon-3-attack-bonus" class="input" contenteditable="true"></span>
+        <span id="weapon-3-damage" class="input" contenteditable="true"></span>
+        <span id="weapon-3-damage-type" class="input" contenteditable="true"></span>
+        <span id="spellcasting-ability" class="input" contenteditable="true"></span>
+        <span id="spell-attack-bonus" class="input" contenteditable="true"></span>
+        <span id="spell-save-dc" class="input" contenteditable="true"></span>
+        <span id="languages" class="input" contenteditable="true"></span>
+        <span id="empty" class="input" contenteditable="true"></span>
+        <span id="abilities-1" class="input" contenteditable="true"></span>
+        <span id="abilities-2" class="input" contenteditable="true"></span>
+    </div>
+</body>
+
+</html>
