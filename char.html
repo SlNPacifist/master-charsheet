@@ -654,6 +654,52 @@
             left: 137mm;
         }
     </style>
+    <script>
+        function updateURL() {
+            const inputs = document.querySelectorAll('.input');
+            const params = new URLSearchParams();
+            
+            inputs.forEach(input => {
+                if (input.tagName.toLowerCase() === 'input' && input.type === 'checkbox') {
+                    params.set(input.id, input.checked);
+                } else {
+                    const content = input.innerHTML.replace(/<div>/g, '\n')
+                        .replace(/<\/div>/g, '')
+                        .replace(/<br>/g, '\n');
+                    params.set(input.id, content);
+                }
+            });
+
+            window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+        }
+
+        function restoreFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            
+            params.forEach((value, key) => {
+                const input = document.getElementById(key);
+                if (input) {
+                    if (input.tagName.toLowerCase() === 'input' && input.type === 'checkbox') {
+                        input.checked = value === 'true';
+                    } else {
+                        input.innerHTML = value.replace(/\n/g, '<br>');
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            restoreFromURL();
+
+            document.querySelectorAll('.input[type="checkbox"]').forEach(input => {
+                input.addEventListener('change', updateURL);
+            });
+
+            document.querySelectorAll('.input:not([type="checkbox"])').forEach(input => {
+                input.addEventListener('input', updateURL);
+            });
+        });
+    </script>
 </head>
 
 <body>
