@@ -715,16 +715,52 @@
             align-items: center;
             padding: 5px;
             border-bottom: 1px solid #eee;
+            gap: 5px;
         }
 
-        .character-item button {
-            margin-left: 10px;
+        .character-item button, .menu-buttons button {
+            cursor: pointer;
+        }
+
+        .character-item .load-button {
+            text-align: left;
+            padding: 5px 10px;
+            background: none;
+            border: none;
+        }
+
+        .character-item .load-button:hover {
+            background-color: #f5f5f5;
+        }
+
+        .character-item .delete-button, .menu-buttons .new-character-button {
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .character-item .delete-button:hover {
+            background-color: #fee;
+            color: #c00;
         }
 
         .menu-buttons {
             margin-top: 10px;
             display: flex;
-            gap: 5px;
+            justify-content: center;
+        }
+
+        .menu-buttons .new-character-button:hover {
+            background-color: #efe;
+            color: #0a0;
         }
     </style>
     <script>
@@ -834,11 +870,8 @@
                     const item = document.createElement('div');
                     item.className = 'character-item';
                     item.innerHTML = `
-                        <span>${character.name || 'Без имени'}</span>
-                        <div>
-                            <button onclick="updateURL('${character.id}')">Загрузить</button>
-                            <button onclick="deleteCharacter('${character.id}')">Удалить</button>
-                        </div>
+                        <button class="load-button" onclick="updateURL('${character.id}')">${character.name || 'Без имени'}</button>
+                        <button class="delete-button" onclick="deleteCharacter('${character.id}')" title="Удалить">×</button>
                     `;
                     listElement.appendChild(item);
                 });
@@ -880,7 +913,7 @@
             <h3>Characters</h3>
             <div id="character-list"></div>
             <div class="menu-buttons">
-                <button onclick="updateURL(null)">Новый персонаж</button>
+                <button class="new-character-button" onclick="updateURL(null)" title="Новый персонаж">+</button>
             </div>
         </div>
     </div>
