@@ -653,56 +653,192 @@
         #lvl-9-spells {
             left: 137mm;
         }
-    </style>
-    <script>
-        function updateURL() {
-            const inputs = document.querySelectorAll('.input');
-            const params = new URLSearchParams();
-            
-            inputs.forEach(input => {
-                if (input.tagName.toLowerCase() === 'input' && input.type === 'checkbox') {
-                    params.set(input.id, input.checked);
-                } else {
-                    const content = input.innerHTML.replace(/<div>/g, '\n')
-                        .replace(/<\/div>/g, '')
-                        .replace(/<br>/g, '\n');
-                    params.set(input.id, content);
-                }
-            });
 
-            window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+        #character-menu {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        function restoreFromURL() {
+        #character-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .character-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .character-item button {
+            margin-left: 10px;
+        }
+
+        .menu-buttons {
+            margin-top: 10px;
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+    <script>
+        let currentCharacterId = null;
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function updateURL(characterId) {
             const params = new URLSearchParams(window.location.search);
-            
-            params.forEach((value, key) => {
-                const input = document.getElementById(key);
+            if (characterId) {
+                params.set('character', characterId);
+            } else {
+                params.delete('character');
+            }
+            window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
+            loadCharacterFromURL();
+        }
+
+        function loadCharacterFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const characterId = params.get('character');
+            if (characterId) {
+                loadCharacter(characterId);
+            } else {
+                clearPage();
+            }
+        }
+
+        function loadCharacter(characterId) {
+            const characters = JSON.parse(localStorage.getItem('characters') || '{}');
+            const character = characters[characterId];
+            if (!character) return;
+
+            currentCharacterId = characterId;
+            Object.entries(character.data).forEach(([id, value]) => {
+                const input = document.getElementById(id);
                 if (input) {
                     if (input.tagName.toLowerCase() === 'input' && input.type === 'checkbox') {
-                        input.checked = value === 'true';
+                        input.checked = value;
                     } else {
-                        input.innerHTML = value.replace(/\n/g, '<br>');
+                        input.innerHTML = value;
                     }
                 }
             });
         }
 
+        function clearPage() {
+            currentCharacterId = null;
+            document.querySelectorAll('.input').forEach(input => {
+                if (input.tagName.toLowerCase() === 'input' && input.type === 'checkbox') {
+                    input.checked = false;
+                } else {
+                    input.innerHTML = '';
+                }
+            });
+        }
+
+        function saveCurrentCharacter() {
+            if (!currentCharacterId) {
+                currentCharacterId = generateId();
+                updateURL(currentCharacterId);
+            }
+
+            const inputs = document.querySelectorAll('.input');
+            const characterData = {
+                id: currentCharacterId,
+                name: document.getElementById('name').innerHTML || 'Без имени',
+                lastModified: new Date().toISOString(),
+                data: {}
+            };
+
+            inputs.forEach(input => {
+                if (input.tagName.toLowerCase() === 'input' && input.type === 'checkbox') {
+                    characterData.data[input.id] = input.checked;
+                } else {
+                    characterData.data[input.id] = input.innerHTML;
+                }
+            });
+
+            const characters = JSON.parse(localStorage.getItem('characters') || '{}');
+            characters[currentCharacterId] = characterData;
+            localStorage.setItem('characters', JSON.stringify(characters));
+            updateCharacterMenu();
+        }
+
+        function deleteCharacter(characterId) {
+            const characters = JSON.parse(localStorage.getItem('characters') || '{}');
+            delete characters[characterId];
+            localStorage.setItem('characters', JSON.stringify(characters));
+            updateCharacterMenu();
+            
+            if (currentCharacterId === characterId) {
+                updateURL(null);
+            }
+        }
+
+        function updateCharacterMenu() {
+            const characters = JSON.parse(localStorage.getItem('characters') || '{}');
+            const listElement = document.getElementById('character-list');
+            listElement.innerHTML = '';
+
+            Object.values(characters)
+                .sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified))
+                .forEach(character => {
+                    const item = document.createElement('div');
+                    item.className = 'character-item';
+                    item.innerHTML = `
+                        <span>${character.name || 'Без имени'}</span>
+                        <div>
+                            <button onclick="updateURL('${character.id}')">Загрузить</button>
+                            <button onclick="deleteCharacter('${character.id}')">Удалить</button>
+                        </div>
+                    `;
+                    listElement.appendChild(item);
+                });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            restoreFromURL();
+            const params = new URLSearchParams(window.location.search);
+            const characterId = params.get('character');
+            if (characterId) {
+                loadCharacter(characterId);
+            }
+            
+            updateCharacterMenu();
 
             document.querySelectorAll('.input[type="checkbox"]').forEach(input => {
-                input.addEventListener('change', updateURL);
+                input.addEventListener('change', saveCurrentCharacter);
             });
 
             document.querySelectorAll('.input:not([type="checkbox"])').forEach(input => {
-                input.addEventListener('input', updateURL);
+                input.addEventListener('input', saveCurrentCharacter);
+            });
+        
+            window.addEventListener('popstate', () => {
+                loadCharacterFromURL();
             });
         });
     </script>
 </head>
 
 <body>
+    <div id="character-menu">
+        <h3>Characters</h3>
+        <div id="character-list"></div>
+        <div class="menu-buttons">
+            <button onclick="updateURL(null)">Новый персонаж</button>
+        </div>
+    </div>
+
     <div class="container">
         <img src="./background.jpeg" alt="Image" class="image">
         <span id="name" class="input" contenteditable="true"></span>
