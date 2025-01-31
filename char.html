@@ -664,6 +664,38 @@
             padding: 10px;
             z-index: 1000;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        #character-menu.collapsed {
+            transform: translateX(calc(100% - 30px));
+        }
+
+        #character-menu-toggle {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 30px;
+            height: 100%;
+            background: white;
+            border: none;
+            border-right: 1px solid #ccc;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #character-menu-toggle::before {
+            content: "▶";
+        }
+
+        #character-menu.collapsed #character-menu-toggle::before {
+            content: "◀";
+        }
+
+        #character-menu-content {
+            margin-left: 30px;
         }
 
         @media print {
@@ -812,11 +844,16 @@
                 });
         }
 
+        function toggleMenu() {
+            document.getElementById('character-menu').classList.toggle('collapsed');
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
             const characterId = params.get('character');
             if (characterId) {
                 loadCharacter(characterId);
+                document.getElementById('character-menu').classList.add('collapsed');
             }
             
             updateCharacterMenu();
@@ -838,10 +875,13 @@
 
 <body>
     <div id="character-menu">
-        <h3>Characters</h3>
-        <div id="character-list"></div>
-        <div class="menu-buttons">
-            <button onclick="updateURL(null)">Новый персонаж</button>
+        <button id="character-menu-toggle" onclick="toggleMenu()"></button>
+        <div id="character-menu-content">
+            <h3>Characters</h3>
+            <div id="character-list"></div>
+            <div class="menu-buttons">
+                <button onclick="updateURL(null)">Новый персонаж</button>
+            </div>
         </div>
     </div>
 
