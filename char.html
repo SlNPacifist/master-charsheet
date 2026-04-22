@@ -756,9 +756,11 @@
             margin-top: 10px;
             display: flex;
             justify-content: center;
+            gap: 8px;
         }
 
-        .menu-buttons .new-character-button:hover {
+        .menu-buttons .new-character-button:hover,
+        .menu-buttons .copy-character-button:hover {
             background-color: #efe;
             color: #0a0;
         }
@@ -860,6 +862,31 @@
             }
         }
 
+        function copyCurrentCharacter() {
+            if (!currentCharacterId) return;
+
+            const characters = JSON.parse(localStorage.getItem('characters') || '{}');
+            const currentCharacter = characters[currentCharacterId];
+            if (!currentCharacter) return;
+
+            const newCharacterId = generateId();
+            const copiedName = currentCharacter.name
+                ? `${currentCharacter.name} (copy)`
+                : 'Без имени (copy)';
+
+            characters[newCharacterId] = {
+                ...currentCharacter,
+                id: newCharacterId,
+                name: copiedName,
+                lastModified: new Date().toISOString(),
+                data: { ...currentCharacter.data, name: copiedName }
+            };
+
+            localStorage.setItem('characters', JSON.stringify(characters));
+            updateCharacterMenu();
+            updateURL(newCharacterId);
+        }
+
         function updateCharacterMenu() {
             const characters = JSON.parse(localStorage.getItem('characters') || '{}');
             const listElement = document.getElementById('character-list');
@@ -914,6 +941,7 @@
             <h3>Characters</h3>
             <div id="character-list"></div>
             <div class="menu-buttons">
+                <button class="new-character-button copy-character-button" onclick="copyCurrentCharacter()" title="Копировать текущего персонажа">⧉</button>
                 <button class="new-character-button" onclick="updateURL(null)" title="Новый персонаж">+</button>
             </div>
         </div>
